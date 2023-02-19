@@ -1,9 +1,11 @@
 from aws_cdk import (
     # Duration,
     Stack,
-    # aws_sqs as sqs,
+    RemovalPolicy,
+    aws_s3 as s3
 )
 from constructs import Construct
+
 
 class HemmerbotStack(Stack):
 
@@ -13,7 +15,5 @@ class HemmerbotStack(Stack):
         # The code that defines your stack goes here
 
         # example resource
-        # queue = sqs.Queue(
-        #     self, "HemmerbotQueue",
-        #     visibility_timeout=Duration.seconds(300),
-        # )
+        bucket = s3.Bucket(self, "MyFirstBucket", removal_policy=RemovalPolicy.DESTROY, auto_delete_objects=True)
+
