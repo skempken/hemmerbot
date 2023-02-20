@@ -15,9 +15,13 @@ from aws_cdk.aws_events import Schedule
 import aws_cdk.aws_events_targets as targets
 from aws_cdk import Duration
 
+# ARN of the S3 bucket to store application data
 S3_BUCKET_ARN = "arn:aws:s3:::skm-trend-replicator"
+
+# Name & Region of application secrets
 SECRET_NAME = "HemmerBot"
 SECRET_REGION = "eu-central-1"
+
 
 class HemmerbotStack(Stack):
 
