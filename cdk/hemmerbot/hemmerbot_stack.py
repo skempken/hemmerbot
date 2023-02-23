@@ -42,19 +42,20 @@ class HemmerbotStack(Stack):
         trend_replicator = lambda_.Function(self,
                                             "TrendReplicator",
                                             runtime=lambda_.Runtime.PYTHON_3_9,
-                                            handler="main.lambda_handler",
+                                            handler="trending_statuses.lambda_handler",
                                             code=lambda_.Code.from_asset(os.path.abspath(
                                                 os.path.join(dirname(__file__), '..', '..', 'lambda-functions', 'hemmerbot'))),
                                             layers=[runtime_environment_layer],
                                             log_retention=aws_cdk.aws_logs.RetentionDays.ONE_DAY,
                                             environment={
                                                 "S3_BUCKET_NAME": S3_BUCKET_NAME
-                                            }
+                                            },
+                                            timeout=Duration.minutes(1)
                                             )
         bucket.grant_read_write(trend_replicator)
 
         # Periodic invocation
         rule = Rule(self,
                     "PeriodicEvents",
-                    schedule=Schedule.rate(duration=Duration.minutes(1)),
+                    schedule=Schedule.rate(duration=Duration.minutes(20)),
                     targets=[targets.LambdaFunction(trend_replicator)])
