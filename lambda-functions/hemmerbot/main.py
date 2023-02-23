@@ -5,7 +5,7 @@ import os
 
 def lambda_handler(event, context):
 
-    secret_values = secret.get_secret(os.environ['SECRET_REGION'], os.environ['SECRET_NAME'])
+    secret_values = secret.get_secrets()
     mastodon = Mastodon(api_base_url=secret_values['api_base_url'],
                         access_token=secret_values['access_token'])
 

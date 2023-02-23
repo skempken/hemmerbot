@@ -17,11 +17,7 @@ from aws_cdk import Duration
 
 # ARN of the S3 bucket to store application data
 S3_BUCKET_ARN = "arn:aws:s3:::skm-trend-replicator"
-
-# Name & Region of application secrets
-SECRET_NAME = "HemmerBot"
-SECRET_REGION = "eu-central-1"
-
+S3_BUCKET_NAME = "skm-trend-replicator"
 
 class HemmerbotStack(Stack):
 
@@ -52,15 +48,10 @@ class HemmerbotStack(Stack):
                                             layers=[runtime_environment_layer],
                                             log_retention=aws_cdk.aws_logs.RetentionDays.ONE_DAY,
                                             environment={
-                                                "SECRET_NAME": SECRET_NAME,
-                                                "SECRET_REGION": SECRET_REGION
+                                                "S3_BUCKET_NAME": S3_BUCKET_NAME
                                             }
                                             )
-
-        read_secret = aws_cdk.aws_secretsmanager.Secret.from_secret_name_v2(self,
-                                                                            "AccessToken",
-                                                                            secret_name=SECRET_NAME)
-        read_secret.grant_read(trend_replicator)
+        bucket.grant_read_write(trend_replicator)
 
         # Periodic invocation
         rule = Rule(self,
