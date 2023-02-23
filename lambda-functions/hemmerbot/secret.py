@@ -1,28 +1,20 @@
 import json
+import os
 
 import boto3
 from botocore.exceptions import ClientError
 
+S3_BUCKET_NAME = os.environ['S3_BUCKET_NAME']
+SECRETS_OBJECT = 'secrets.json'
+SECRETS_FILE = '/tmp/secrets.json'
 
-def get_secret(region_name, secret_name):
-    # Create a Secrets Manager client
-    session = boto3.session.Session()
-    client = session.client(
-        service_name='secretsmanager',
-        region_name=region_name
-    )
+
+def get_secrets():
+    s3 = boto3.client('s3')
+    s3.download_file(S3_BUCKET_NAME, SECRETS_OBJECT, SECRETS_FILE)
 
     try:
-        get_secret_value_response = client.get_secret_value(
-            SecretId=secret_name
-        )
-    except ClientError as e:
-        # For a list of exceptions thrown, see
-        # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
-        raise e
-
-    # Decrypts secret using the associated KMS key.
-    secret = get_secret_value_response['SecretString']
-
-    # Your code goes here.
-    return json.loads(secret)
+        with open(SECRETS_FILE, 'r') as infile:
+            return json.load(infile)
+    except FileNotFoundError:
+        return set()
