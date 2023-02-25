@@ -52,10 +52,29 @@ class HemmerbotStack(Stack):
                                             },
                                             timeout=Duration.minutes(1)
                                             )
+        hashtag_replicator = lambda_.Function(self,
+                                            "HashtagReplicator",
+                                            runtime=lambda_.Runtime.PYTHON_3_9,
+                                            handler="followed_hashtags.lambda_handler",
+                                            code=lambda_.Code.from_asset(os.path.abspath(
+                                                os.path.join(dirname(__file__), '..', '..', 'lambda-functions', 'hemmerbot'))),
+                                            layers=[runtime_environment_layer],
+                                            log_retention=aws_cdk.aws_logs.RetentionDays.ONE_DAY,
+                                            environment={
+                                                "S3_BUCKET_NAME": S3_BUCKET_NAME
+                                            },
+                                            timeout=Duration.minutes(1)
+                                            )
         bucket.grant_read_write(trend_replicator)
+        bucket.grant_read_write(hashtag_replicator)
 
         # Periodic invocation
-        rule = Rule(self,
-                    "PeriodicEvents",
+        rule_trend_replicator = Rule(self,
+                    "PeriodicTrendReplicatorEvents",
                     schedule=Schedule.rate(duration=Duration.minutes(20)),
                     targets=[targets.LambdaFunction(trend_replicator)])
+
+        rule_hashtag_replicator = Rule(self,
+                    "PeriodicHashtagReplicatorEvents",
+                    schedule=Schedule.rate(duration=Duration.minutes(20)),
+                    targets=[targets.LambdaFunction(hashtag_replicator)])
