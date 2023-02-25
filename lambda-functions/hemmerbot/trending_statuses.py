@@ -1,5 +1,5 @@
 import json
-import secret
+import secrets
 import requests
 import os
 import boto3
@@ -67,12 +67,17 @@ def pull_s3(file):
     return
 
 
-def lambda_handler(event, context):
-    secret_values = secret.get_secrets()
-    api_base_url = secret_values['api_base_url']
-    access_token = secret_values['access_token']
+def get_instances():
+    with open('trending_statuses.json', 'r') as infile:
+        return json.load(infile)['instances']
 
-    instances = ['mastodon.social', 'chaos.social', 'det.social']
+
+def lambda_handler(event, context):
+    secret_values = secrets.get_secrets()
+    api_base_url = secret_values['query']['api_base_url']
+    access_token = secret_values['query']['access_token']
+
+    instances = get_instances()
 
     status_urls = set()
     for instance in instances:

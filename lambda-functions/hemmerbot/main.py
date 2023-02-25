@@ -1,13 +1,13 @@
 from mastodon import Mastodon
-import secret
+import secrets
 import os
 
 
 def lambda_handler(event, context):
 
-    secret_values = secret.get_secrets()
-    mastodon = Mastodon(api_base_url=secret_values['api_base_url'],
-                        access_token=secret_values['access_token'])
+    secret_values = secrets.get_secrets()
+    mastodon = Mastodon(api_base_url=secret_values['query']['api_base_url'],
+                        access_token=secret_values['query']['access_token'])
 
     mastodon.toot('Helau!')
 
